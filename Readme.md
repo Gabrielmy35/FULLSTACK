@@ -1,6 +1,6 @@
 # Sistema de Gestión para Farmacia Nova Salud
 
-![Captura de pantalla de la aplicación](screenshot.png)
+
 
 Sistema web moderno para gestión de inventario y ventas, desarrollado con React (frontend), Node.js (backend) y MySQL (base de datos).
 
