@@ -4,18 +4,24 @@ const Sales = () => {
   const [cart, setCart] = useState([]);
   const [products, setProducts] = useState([]);
   const [searchTerm, setSearchTerm] = useState('');
+  const [showSuccess, setShowSuccess] = useState(false);
+  const [ventaId, setVentaId] = useState(null);
 
   useEffect(() => {
-    const loadProducts = async () => {
+    const fetchProducts = async () => {
       try {
         const response = await fetch('http://localhost:5000/api/productos');
         const data = await response.json();
-        setProducts(data);
+        const formattedProducts = data.map(p => ({
+          ...p,
+          precio: parseFloat(p.precio)
+        }));
+        setProducts(formattedProducts);
       } catch (error) {
         console.error("Error cargando productos:", error);
       }
     };
-    loadProducts();
+    fetchProducts();
   }, []);
 
   const addToCart = (product) => {
@@ -45,15 +51,29 @@ const Sales = () => {
       const response = await fetch('http://localhost:5000/api/ventas', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ total, productos })
+        body: JSON.stringify({
+          total: total.toFixed(2),
+          productos
+        })
       });
 
-      if (response.ok) {
+      const result = await response.json();
+      
+      if (result.success) {
+        setShowSuccess(true);
+        setVentaId(result.ventaId);
         setCart([]);
-        alert('Venta registrada exitosamente!');
+        
+        // Actualizar lista de productos
         const updatedResponse = await fetch('http://localhost:5000/api/productos');
         const updatedData = await updatedResponse.json();
-        setProducts(updatedData);
+        setProducts(updatedData.map(p => ({ ...p, precio: parseFloat(p.precio) })));
+
+        // Ocultar mensaje después de 3 segundos
+        setTimeout(() => {
+          setShowSuccess(false);
+          setVentaId(null);
+        }, 3000);
       }
     } catch (error) {
       console.error("Error procesando venta:", error);
@@ -63,6 +83,12 @@ const Sales = () => {
 
   return (
     <div className="container">
+      {showSuccess && (
+        <div className="success-message">
+          ✅ Venta registrada correctamente - N° de transacción: {ventaId}
+        </div>
+      )}
+
       <div className="sales-layout">
         <div className="product-selection">
           <div className="search-bar">
@@ -76,7 +102,9 @@ const Sales = () => {
           
           <div className="product-grid">
             {products
-              .filter(p => p.nombre.toLowerCase().includes(searchTerm.toLowerCase()))
+              .filter(p => 
+                p.nombre.toLowerCase().includes(searchTerm.toLowerCase())
+              )
               .map(product => (
                 <div 
                   key={product.id} 
