@@ -85,36 +85,70 @@ const ProductList = () => {
     <div className="container">
       <div className="header">
         <h2>Gestión de Productos</h2>
-        <button onClick={() => setShowForm(!showForm)}>
-          {showForm ? 'Cancelar' : 'Nuevo Producto'}
+        <button 
+          className="btn btn-primary"
+          onClick={() => setShowForm(!showForm)}
+        >
+          <i className="fas fa-plus"></i>
+          {showForm ? ' Cancelar' : ' Nuevo Producto'}
         </button>
       </div>
 
       {showForm && (
-        <form onSubmit={handleSubmit} className="product-form">
-          <input
-            type="text"
-            placeholder="Nombre"
-            value={formData.nombre}
-            onChange={(e) => setFormData({ ...formData, nombre: e.target.value })}
-            required
-          />
-          <input
-            type="number"
-            step="0.01"
-            placeholder="Precio"
-            value={formData.precio}
-            onChange={(e) => setFormData({ ...formData, precio: e.target.value })}
-            required
-          />
-          <input
-            type="number"
-            placeholder="Stock"
-            value={formData.stock}
-            onChange={(e) => setFormData({ ...formData, stock: e.target.value })}
-            required
-          />
-          <button type="submit">{editId ? 'Actualizar' : 'Guardar'}</button>
+        <form onSubmit={handleSubmit}>
+          <table className="form-table">
+            <tbody>
+              <tr>
+                <td>
+                  <label>Nombre del Producto</label>
+                  <input
+                    type="text"
+                    value={formData.nombre}
+                    onChange={(e) => setFormData({ ...formData, nombre: e.target.value })}
+                    required
+                  />
+                </td>
+              </tr>
+              <tr>
+                <td>
+                  <label>Precio (S/)</label>
+                  <input
+                    type="number"
+                    step="0.01"
+                    value={formData.precio}
+                    onChange={(e) => setFormData({ ...formData, precio: e.target.value })}
+                    required
+                  />
+                </td>
+              </tr>
+              <tr>
+                <td>
+                  <label>Stock Disponible</label>
+                  <input
+                    type="number"
+                    value={formData.stock}
+                    onChange={(e) => setFormData({ ...formData, stock: e.target.value })}
+                    required
+                  />
+                </td>
+              </tr>
+              <tr>
+                <td>
+                  <button type="submit" className="btn btn-primary">
+                    {editId ? (
+                      <>
+                        <i className="fas fa-save"></i> Actualizar Producto
+                      </>
+                    ) : (
+                      <>
+                        <i className="fas fa-plus-circle"></i> Crear Nuevo Producto
+                      </>
+                    )}
+                  </button>
+                </td>
+              </tr>
+            </tbody>
+          </table>
         </form>
       )}
 
@@ -129,18 +163,30 @@ const ProductList = () => {
             </tr>
           </thead>
           <tbody>
-        {products.map(product => (
-          <tr key={product.id}>
-            <td>{product.nombre}</td>
-            <td>S/ {typeof product.precio === 'number' ? product.precio.toFixed(2) : '0.00'}</td>
-            <td>{product.stock}</td>
-            <td>
-              <button onClick={() => handleEdit(product)}>Editar</button>
-              <button onClick={() => handleDelete(product.id)}>Eliminar</button>
-            </td>
-          </tr>
-        ))}
-      </tbody>
+            {products.map(product => (
+              <tr key={product.id}>
+                <td>{product.nombre}</td>
+                <td>S/ {product.precio?.toFixed(2) || '0.00'}</td>
+                <td>{product.stock}</td>
+                <td>
+                  <div className="action-buttons">
+                    <button 
+                      className="btn btn-edit"
+                      onClick={() => handleEdit(product)}
+                    >
+                      <i className="fas fa-edit"></i> Editar
+                    </button>
+                    <button 
+                      className="btn btn-delete"
+                      onClick={() => handleDelete(product.id)}
+                    >
+                      <i className="fas fa-trash-alt"></i> Eliminar
+                    </button>
+                  </div>
+                </td>
+              </tr>
+            ))}
+          </tbody>
         </table>
       </div>
     </div>
